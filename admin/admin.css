@@ -1,0 +1,7 @@
+
+:root{--bg:#0f1115;--card:#171a21;--text:#e6edf3;--muted:#9aa5b1;--brand:#2bb0ed;}
+html,body{background:var(--bg);color:var(--text);}
+.nc-appHeader, .nc-collectionHeader, .nc-sidebar, .nc-entryEditor-header, .nc-toolbar{
+  background:var(--card)!important; border-color:#222!important;
+}
+a, .nc-link{color:var(--brand);}

@@ -1,53 +1,92 @@
+
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="robots" content="noindex" />
-    <title>Admin — Grimlayer</title>
-    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-    <script src="https://unpkg.com/decap-cms@^3.4.1/dist/decap-cms.js"></script>
-    <style>
-      html,body{height:100%;background:#0b0d10;color:#c9d1d9}
-      .boot{position:fixed;bottom:32px;left:0;right:0;text-align:center;font:16px/1.6 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Inter,Helvetica,Arial}
-      a{color:#58a6ff;text-decoration:none}
-    </style>
-  </head>
-  <body>
-    <div class="boot">Loading Admin…  <a href="/admin/health.html">Health check</a></div>
-    <script>
-      window.CMS_MANUAL_INIT = true;
-      const config = {
-        backend: { name: 'git-gateway', branch: 'main' },
-        site_url: 'https://grimlayertattoo.com',
-        display_url: 'https://grimlayertattoo.com',
-        media_folder: 'assets/uploads',
-        public_folder: '/assets/uploads',
-        collections: [
-          {
-            name: 'portfolio',
-            label: 'Portfolio',
-            label_singular: 'Piece',
-            folder: 'content/portfolio',
-            create: true,
-            slug: '{{slug}}',
-            fields: [
-              { label: 'Title', name: 'title', widget: 'string' },
-              { label: 'Date', name: 'date', widget: 'datetime' },
-              { label: 'Description', name: 'body', widget: 'text' },
-              { label: 'Image', name: 'image', widget: 'image' }
-            ]
-          }
-        ]
-      };
-      CMS.init({ config });
-      if (window.netlifyIdentity) {
-        window.netlifyIdentity.on('init', (user) => {
-          if (!user) {
-            window.netlifyIdentity.on('login', () => { document.location.reload(); });
-          }
-        });
-      }
-    </script>
-  </body>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Site Admin</title>
+  <link rel="stylesheet" href="./admin.css">
+  <!-- Netlify Identity Widget (for login modal) -->
+  <script defer src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <!-- Decap CMS core -->
+  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  <style>body{display:flex;align-items:center;justify-content:center;min-height:100vh}#load{color:#9aa5b1}</style>
+</head>
+<body>
+  <div id="load">
+    <div style="text-align:center">
+      <div>Loading Admin…</div>
+      <div style="margin-top:12px"><a href="./health.html" style="color:#2bb0ed">Health check</a></div>
+    </div>
+  </div>
+<script>
+// Inline fallback config so the CMS still boots if config.yml is blocked/cached.
+const inlineConfig = {
+  backend: { name: "git-gateway", branch: "main" },
+  site_url: "https://grimlayertattoo.com",
+  logo_url: "/assets/icon.svg",
+  publish_mode: "editorial_workflow",
+  media_folder: "assets/uploads",
+  public_folder: "/assets/uploads",
+  i18n: { structure: "single_file", locales: ["en", "es"], default_locale: "en" },
+  collections: [
+    {
+      name: "portfolio",
+      label: "Portfolio",
+      label_singular: "Piece",
+      folder: "content/portfolio",
+      create: true,
+      slug: "{{year}}-{{month}}-{{day}}-{{slug}}",
+      i18n: true,
+      fields: [
+        { label: "Title", name: "title", widget: "string", i18n: true },
+        { label: "Publish Date", name: "date", widget: "datetime" },
+        { label: "Cover Image", name: "image", widget: "image", choose_url: true },
+        { label: "Alt text", name: "alt", widget: "string", required: false, i18n: true },
+        { label: "Tags", name: "tags", widget: "list", required: false },
+        { label: "Body", name: "body", widget: "markdown", i18n: true }
+      ]
+    },
+    {
+      name: "aftercare",
+      label: "Aftercare",
+      files: [
+        {
+          file: "content/aftercare/instructions.md",
+          label: "Instructions",
+          name: "instructions",
+          i18n: true,
+          fields: [
+            { label: "Title", name: "title", widget: "string", i18n: true },
+            { label: "Body", name: "body", widget: "markdown", i18n: true }
+          ]
+        }
+      ]
+    }
+  ]
+};
+
+// Try to load config.yml first; fallback to inlineConfig if it fails.
+(async () => {
+  try {
+    const res = await fetch('./config.yml', { cache: 'no-store' });
+    if (!res.ok) throw new Error('config.yml ' + res.status);
+    // Let Decap load its default /admin/config.yml by itself.
+    // No-op here so Decap continues with file config.
+  } catch (e) {
+    // Fallback to inline init
+    console.warn('Using inline CMS config fallback:', e.message);
+    window.CMS_MANUAL_INIT = true;
+    CMS.init({ config: inlineConfig });
+  }
+})();
+
+// Ensure identity redirects back here after auth
+if (window.netlifyIdentity) {
+  window.netlifyIdentity.on('init', user => {
+    if (!user) window.netlifyIdentity.on('login', () => window.location.reload());
+  });
+}
+</script>
+</body>
 </html>

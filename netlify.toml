@@ -1,0 +1,20 @@
+[build]
+  publish = "."
+
+# Prevent aggressive caching for admin
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    Cache-Control = "no-store, no-cache, must-revalidate, max-age=0"
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+
+# Keep config.yml fresh
+[[headers]]
+  for = "/admin/config.yml"
+  [headers.values]
+    Cache-Control = "no-store, no-cache, must-revalidate, max-age=0"
+
+# Identity widget hint (optional)
+[context.production.environment]
+  IDENTITY_REDIRECT_URI = "/admin/"

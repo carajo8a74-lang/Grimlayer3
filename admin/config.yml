@@ -2,21 +2,46 @@ backend:
   name: git-gateway
   branch: main
 
-media_folder: "assets/uploads"
-public_folder: "/assets/uploads"
+site_url: https://grimlayertattoo.com
+logo_url: /assets/icon.svg
 
-site_url: "https://grimlayertattoo.com"
-display_url: "https://grimlayertattoo.com"
+publish_mode: editorial_workflow
+
+media_folder: assets/uploads
+public_folder: /assets/uploads
+
+i18n:
+  structure: single_file
+  locales: [en, es]
+  default_locale: en
 
 collections:
-  - name: "portfolio"
-    label: "Portfolio"
-    label_singular: "Piece"
-    folder: "content/portfolio"
+  - name: portfolio
+    label: Portfolio
+    label_singular: Piece
+    folder: content/portfolio
     create: true
-    slug: "{{slug}}"
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    i18n: true
+    sortable_fields: [date, title]
+    view_groups:
+      - { label: Year, field: date, pattern: "YYYY" }
+      - { label: Tag, field: tags }
     fields:
-      - { label: "Title", name: "title", widget: "string" }
-      - { label: "Date", name: "date", widget: "datetime" }
-      - { label: "Description", name: "body", widget: "text" }
-      - { label: "Image", name: "image", widget: "image" }
+      - { label: Title, name: title, widget: string, i18n: true }
+      - { label: Publish Date, name: date, widget: datetime }
+      - { label: Cover Image, name: image, widget: image, choose_url: true }
+      - { label: Alt text, name: alt, widget: string, required: false, i18n: true }
+      - { label: Tags, name: tags, widget: list, required: false }
+      - { label: Body, name: body, widget: markdown, i18n: true }
+
+  - name: aftercare
+    label: Aftercare
+    files:
+      - file: content/aftercare/instructions.md
+        label: Instructions
+        name: instructions
+        i18n: true
+        fields:
+          - { label: Title, name: title, widget: string, i18n: true }
+          - { label: Body, name: body, widget: markdown, i18n: true }
