@@ -1,20 +1,17 @@
-[build]
-  publish = "."
-
-# Prevent aggressive caching for admin
+# Fuerza que /admin y config.yml no se sirvan desde caché
 [[headers]]
   for = "/admin/*"
   [headers.values]
     Cache-Control = "no-store, no-cache, must-revalidate, max-age=0"
-    X-Frame-Options = "SAMEORIGIN"
-    X-Content-Type-Options = "nosniff"
 
-# Keep config.yml fresh
 [[headers]]
   for = "/admin/config.yml"
   [headers.values]
     Cache-Control = "no-store, no-cache, must-revalidate, max-age=0"
 
-# Identity widget hint (optional)
-[context.production.environment]
-  IDENTITY_REDIRECT_URI = "/admin/"
+# Accesos a Identity desde cualquier subdominio/dominio que uses
+[[headers]]
+  for = "/.netlify/identity/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Cache-Control = "no-store"
