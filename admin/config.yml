@@ -1,47 +1,40 @@
 backend:
   name: git-gateway
   branch: main
-
-# Evita problemas de caché en móvil
-publish_mode: editorial_workflow
-local_backend: false
 media_folder: "assets/uploads"
 public_folder: "/assets/uploads"
-
+publish_mode: simple
 site_url: "https://grimlayertattoo.com"
-display_url: "https://grimlayertattoo.com"
-logo_url: "/assets/uploads/logo.png"
 
+locale: "en"
 i18n:
-  structure: multiple_files
+  structure: multiple_folders
   locales: [en, es]
   default_locale: en
 
 collections:
   - name: "portfolio"
     label: "Portfolio"
-    label_singular: "Piece"
     folder: "content/portfolio"
     create: true
-    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
-    i18n: true
-    fields:
-      - { label: "Title", name: "title", widget: "string", i18n: true }
-      - { label: "Date", name: "date", widget: "datetime" }
-      - { label: "Cover", name: "image", widget: "image", allow_multiple: false }
-      - { label: "Description", name: "body", widget: "markdown", i18n: true }
-
-  - name: "aftercare"
-    label: "Aftercare"
-    folder: "content/aftercare"
-    create: true
     slug: "{{slug}}"
-    i18n: true
     fields:
-      - { label: "Title", name: "title", widget: "string", i18n: true }
-      - { label: "Content", name: "body", widget: "markdown", i18n: true }
-
-  - name: "booking"
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Date", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
+      - { label: "Featured Image", name: "cover", widget: "image", choose_url: false, required: true }
+      - { label: "Body", name: "body", widget: "markdown", required: false }
+  - name: "pages"
+    label: "Pages"
+    files:
+      - file: "content/home.md"
+        label: "Home"
+        name: "home"
+        fields:
+          - { label: "Headline (EN)", name: "headline_en", widget: "string" }
+          - { label: "Headline (ES)", name: "headline_es", widget: "string" }
+          - { label: "Intro (EN)", name: "intro_en", widget: "text" }
+          - { label: "Intro (ES)", name: "intro_es", widget: "text" }
+  - name: "bookings"
     label: "Booking Requests"
     folder: "content/booking"
     create: true
@@ -49,7 +42,7 @@ collections:
     fields:
       - { label: "Client name", name: "client", widget: "string" }
       - { label: "Email", name: "email", widget: "string" }
-      - { label: "Phone / WhatsApp", name: "phone", widget: "string", required: false }
-      - { label: "Preferred date", name: "preferred_date", widget: "datetime", required: false }
-      - { label: "Idea / description", name: "body", widget: "markdown" }
-      - { label: "Reference images", name: "refs", widget: "list", collapsed: true, fields: [{label: "Image", name: "img", widget: "image"}] }
+      - { label: "Phone", name: "phone", widget: "string", required: false }
+      - { label: "Description", name: "description", widget: "text" }
+      - { label: "Reference images", name: "refs", widget: "list", summary: "{{fields.image}}", field: {label: "Image", name: "image", widget: "image"} }
+      - { label: "Notes (private)", name: "notes", widget: "text", required: false }

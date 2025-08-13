@@ -1,30 +1,35 @@
-
 <!doctype html>
+<html lang="en">
+<head>
 <meta charset="utf-8">
-<title>Admin Health Check</title>
-<style>body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#0f1115;color:#e6edf3;padding:24px}code{background:#171a21;padding:2px 6px;border-radius:4px}</style>
-<h1>Admin Health Check</h1>
-<p>Use this to verify the two things the CMS needs:</p>
-<ol>
-  <li><strong>config.yml</strong> is reachable (200)</li>
-  <li><strong>Identity endpoint</strong> responds (should be 200 after login)</li>
-</ol>
-<div id="out"></div>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Health</title>
+<style>
+  body{background:#111;color:#eee;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;padding:32px}
+  code{background:#222;padding:2px 6px;border-radius:4px}
+  .ok{color:#7CFC9F}.bad{color:#ffa7a7}
+</style>
+</head>
+<body>
+<h1>Admin Health</h1>
+<div id="conf">Checking config.yml…</div>
+<div id="ident">Checking Identity endpoint…</div>
+
 <script>
 (async () => {
-  const out = document.getElementById('out');
-  const row = (label, code) => `<p><strong>${label}:</strong> <code>${code}</code></p>`;
   try {
-    const r1 = await fetch('./config.yml', {cache:'no-store'});
-    out.innerHTML += row('Fetch config.yml status', r1.status);
-  } catch(e){
-    out.innerHTML += row('Fetch config.yml error', e.message);
+    const res = await fetch('./config.yml', { cache: 'no-store' });
+    document.getElementById('conf').innerHTML = 'Fetch config.yml: status <code class="' + (res.ok?'ok':'bad') + '">' + res.status + '</code>';
+  } catch (e) {
+    document.getElementById('conf').innerHTML = 'Fetch config.yml: <code class="bad">FAILED</code>';
   }
   try {
-    const r2 = await fetch('/.netlify/identity/user', {credentials:'include'});
-    out.innerHTML += row('Identity endpoint status', r2.status);
-  } catch(e){
-    out.innerHTML += row('Identity endpoint error', e.message);
+    const r2 = await fetch('/.netlify/identity/user', { credentials: 'include' });
+    document.getElementById('ident').innerHTML = 'Identity endpoint: status <code class="' + (r2.status===200?'ok':'bad') + '">' + r2.status + '</code>';
+  } catch (e) {
+    document.getElementById('ident').innerHTML = 'Identity endpoint: <code class="bad">FAILED</code>';
   }
 })();
 </script>
+</body>
+</html>
