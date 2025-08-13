@@ -1,92 +1,49 @@
-
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Site Admin</title>
-  <link rel="stylesheet" href="./admin.css">
-  <!-- Netlify Identity Widget (for login modal) -->
-  <script defer src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-  <!-- Decap CMS core -->
-  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
-  <style>body{display:flex;align-items:center;justify-content:center;min-height:100vh}#load{color:#9aa5b1}</style>
+  <title>Admin — Decap CMS</title>
+  <style>
+    html,body{height:100%;margin:0;background:#111;color:#ccc;font-family:system-ui,-apple-system,Segoe UI,Roboto}
+    .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
+    a{color:#6cf;text-decoration:none}
+  </style>
+  <!-- Netlify Identity widget (login modal) -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <!-- Decap CMS -->
+  <script src="https://unpkg.com/decap-cms@^3.3.0/dist/decap-cms.js"></script>
 </head>
 <body>
-  <div id="load">
-    <div style="text-align:center">
-      <div>Loading Admin…</div>
-      <div style="margin-top:12px"><a href="./health.html" style="color:#2bb0ed">Health check</a></div>
-    </div>
+  <div class="wrap">
+    <div id="cms-root">Loading Admin…</div>
+    <a href="./health.html" style="font-size:14px;opacity:.8">Health check</a>
   </div>
-<script>
-// Inline fallback config so the CMS still boots if config.yml is blocked/cached.
-const inlineConfig = {
-  backend: { name: "git-gateway", branch: "main" },
-  site_url: "https://grimlayertattoo.com",
-  logo_url: "/assets/icon.svg",
-  publish_mode: "editorial_workflow",
-  media_folder: "assets/uploads",
-  public_folder: "/assets/uploads",
-  i18n: { structure: "single_file", locales: ["en", "es"], default_locale: "en" },
-  collections: [
-    {
-      name: "portfolio",
-      label: "Portfolio",
-      label_singular: "Piece",
-      folder: "content/portfolio",
-      create: true,
-      slug: "{{year}}-{{month}}-{{day}}-{{slug}}",
-      i18n: true,
-      fields: [
-        { label: "Title", name: "title", widget: "string", i18n: true },
-        { label: "Publish Date", name: "date", widget: "datetime" },
-        { label: "Cover Image", name: "image", widget: "image", choose_url: true },
-        { label: "Alt text", name: "alt", widget: "string", required: false, i18n: true },
-        { label: "Tags", name: "tags", widget: "list", required: false },
-        { label: "Body", name: "body", widget: "markdown", i18n: true }
-      ]
-    },
-    {
-      name: "aftercare",
-      label: "Aftercare",
-      files: [
-        {
-          file: "content/aftercare/instructions.md",
-          label: "Instructions",
-          name: "instructions",
-          i18n: true,
-          fields: [
-            { label: "Title", name: "title", widget: "string", i18n: true },
-            { label: "Body", name: "body", widget: "markdown", i18n: true }
-          ]
-        }
-      ]
+
+  <script>
+    // Arranca el widget de Identity (necesario para Git Gateway)
+    if (window.netlifyIdentity) {
+      window.netlifyIdentity.on('init', user => {
+        if (!user) window.netlifyIdentity.on('login', () => window.location.reload());
+      });
+      window.netlifyIdentity.init({ APIUrl: '/.netlify/identity' });
     }
-  ]
-};
 
-// Try to load config.yml first; fallback to inlineConfig if it fails.
-(async () => {
-  try {
-    const res = await fetch('./config.yml', { cache: 'no-store' });
-    if (!res.ok) throw new Error('config.yml ' + res.status);
-    // Let Decap load its default /admin/config.yml by itself.
-    // No-op here so Decap continues with file config.
-  } catch (e) {
-    // Fallback to inline init
-    console.warn('Using inline CMS config fallback:', e.message);
+    // Evita “Loading Admin…” por caché de config.yml
+    const bust = 'v=' + Date.now();
     window.CMS_MANUAL_INIT = true;
-    CMS.init({ config: inlineConfig });
-  }
-})();
+    fetch('./config.yml?' + bust, { cache: 'no-store' })
+      .then(r => r.ok ? r.text() : Promise.reject(new Error('config ' + r.status)))
+      .then(yml => {
+        const config = window.jsyaml.load(yml);
+        window.CMS.init({ config });       // inicia Decap con la config cargada
+      })
+      .catch(err => {
+        document.getElementById('cms-root').textContent = 'Error loading config: ' + err.message;
+      });
+  </script>
 
-// Ensure identity redirects back here after auth
-if (window.netlifyIdentity) {
-  window.netlifyIdentity.on('init', user => {
-    if (!user) window.netlifyIdentity.on('login', () => window.location.reload());
-  });
-}
-</script>
+  <!-- jsyaml para parsear YML en el navegador -->
+  <script src="https://unpkg.com/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
 </body>
 </html>
