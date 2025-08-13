@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Admin Health</title>
+    <style>
+      body{background:#0b0d10;color:#c9d1d9;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial;padding:24px}
+      a{color:#58a6ff}
+      code{background:#161b22;padding:4px 6px;border-radius:6px}
+      .ok{color:#3fb950}.bad{color:#f85149}
+    </style>
+  </head>
+  <body>
+    <h1>Admin Health Check</h1>
+    <ol>
+      <li>Config (inline): <span class="ok">OK</span></li>
+      <li>Identity endpoint: <a href="/.netlify/identity/settings">/.netlify/identity/settings</a></li>
+      <li>Current origin: <code id="o"></code></li>
+    </ol>
+    <script>document.getElementById('o').textContent = location.origin;</script>
+  </body>
+</html>

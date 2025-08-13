@@ -1,0 +1,22 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "assets/uploads"
+public_folder: "/assets/uploads"
+
+site_url: "https://grimlayertattoo.com"
+display_url: "https://grimlayertattoo.com"
+
+collections:
+  - name: "portfolio"
+    label: "Portfolio"
+    label_singular: "Piece"
+    folder: "content/portfolio"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Date", name: "date", widget: "datetime" }
+      - { label: "Description", name: "body", widget: "text" }
+      - { label: "Image", name: "image", widget: "image" }
